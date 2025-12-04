@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Item - oneSEt</title>
+    {% load static %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF1B6D;
+            --primary-dark: #E01860;
+            --bg-dark: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --border: #e5e7eb;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar - ORIGINAL TUMHARA - Mobile Friendly */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 100;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                width: 280px;
+                transform: translateX(-100%);
+                z-index: 1000;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .sidebar-section {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+            font-size: 14px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Header - Mobile Friendly */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 16px;
+                gap: 12px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: white;
+            }
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .menu-toggle:active {
+                background: var(--bg-tertiary);
+            }
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .search-container {
+                max-width: none;
+            }
+            
+            .search-input {
+                padding: 10px 12px 10px 40px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 12px 10px 36px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-dark);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-tertiary);
+            pointer-events: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .header-right {
+                gap: 8px;
+            }
+        }
+
+        .icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .icon-button {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .icon-button:active {
+                background: var(--primary);
+                border-color: var(--primary);
+                color: white;
+            }
+        }
+
+        /* Content Area - IMPROVED VERSION - Mobile Friendly */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 24px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 20px 16px;
+                padding-bottom: 100px; /* Space for mobile keyboard */
+                overflow-x: hidden;
+            }
+        }
+
+        /* Form Container - Mobile Friendly */
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                max-width: 100%;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .form-header {
+                margin-bottom: 24px;
+                text-align: left;
+            }
+            
+            .form-header h1 {
+                font-size: 24px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .form-header p {
+                font-size: 14px !important;
+                text-align: left !important;
+                margin: 0 !important;
+            }
+        }
+
+        .form-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Form Card - Clean & Modern - Mobile Friendly */
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .form-card {
+                padding: 24px 20px;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        /* Form Groups - Mobile Friendly */
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                margin-bottom: 20px;
+            }
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label .required {
+            color: #ef4444;
+            font-size: 12px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 15px;
+            color: var(--text-primary);
+            background: white;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        /* Mobile input fixes */
+        @media (max-width: 768px) {
+            .form-input,
+            .form-textarea,
+            .form-select {
+                font-size: 16px !important; /* Prevent zoom on iOS */
+                padding: 16px;
+                border-radius: 10px;
+            }
+            
+            /* Prevent zoom on focus */
+            input[type="text"],
+            input[type="url"],
+            input[type="date"],
+            textarea,
+            select {
+                font-size: 16px !important;
+            }
+            
+            /* Fix for date input */
+            input[type="date"] {
+                min-height: 48px;
+            }
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 27, 109, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 140px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .form-textarea {
+                min-height: 120px;
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        /* Type Selector - IMPROVED - Mobile Friendly */
+        .type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .type-selector {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .type-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .type-card {
+            padding: 20px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .type-card {
+                padding: 16px 12px;
+                gap: 8px;
+            }
+            
+            .type-card:active {
+                border-color: var(--primary);
+                background: #fef2f7;
+                transform: scale(0.98);
+            }
+        }
+
+        .type-card:hover {
+            border-color: var(--primary);
+            background: #fef2f7;
+            transform: translateY(-2px);
+        }
+
+        .type-card.active {
+            border-color: var(--primary);
+            background: #fef2f7;
+            box-shadow: 0 4px 12px rgba(255, 27, 109, 0.1);
+        }
+
+        .type-card input[type="radio"] {
+            display: none;
+        }
+
+        .type-card i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .type-card i {
+                font-size: 20px;
+            }
+        }
+
+        .type-card span {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .type-card span {
+                font-size: 13px;
+            }
+        }
+
+        /* Tags Input - Mobile Friendly */
+        .tags-container {
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            background: white;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 48px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .tags-container {
+                padding: 10px;
+                gap: 6px;
+            }
+        }
+
+        .tags-container:focus-within {
+            border-color: var(--primary);
+        }
+
+        .tag {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+        }
+
+        .tags-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+            padding: 6px;
+            font-size: 15px;
+            background: transparent;
+        }
+
+        @media (max-width: 768px) {
+            .tags-input {
+                font-size: 16px;
+                min-width: 80px;
+            }
+        }
+
+        /* File Upload - Mobile Friendly */
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .file-upload {
+                padding: 30px 16px;
+            }
+            
+            .file-upload:active {
+                border-color: var(--primary);
+                background: #fef2f7;
+            }
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background: #fef2f7;
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary);
+            background: #fef2f7;
+        }
+
+        .file-upload-icon {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .file-upload-icon {
+                font-size: 28px;
+                margin-bottom: 12px;
+            }
+        }
+
+        .file-info {
+            margin-top: 16px;
+            padding: 12px;
+            background: #dcfce7;
+            border-radius: 8px;
+            color: #166534;
+            font-weight: 500;
+        }
+
+        /* Starred Checkbox - Mobile Friendly */
+        .starred-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px 16px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        @media (max-width: 768px) {
+            .starred-checkbox {
+                padding: 14px;
+            }
+            
+            .starred-checkbox:active {
+                border-color: var(--primary);
+                transform: scale(0.98);
+            }
+        }
+
+        .starred-checkbox:hover {
+            border-color: var(--primary);
+        }
+
+        .starred-checkbox.active {
+            background: #fef9c3;
+            border-color: #fbbf24;
+        }
+
+        .starred-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+        .star-icon {
+            font-size: 20px;
+            color: #fbbf24;
+        }
+
+        /* Buttons - IMPROVED - Mobile Friendly */
+        .form-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .form-buttons {
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 32px;
+                padding-top: 24px;
+            }
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .btn {
+                padding: 18px 20px;
+                font-size: 16px;
+                border-radius: 10px;
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+            }
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 27, 109, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .btn-primary:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            
+            .btn-primary:active {
+                background: var(--primary-dark);
+            }
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .btn-secondary:hover {
+                transform: none;
+            }
+            
+            .btn-secondary:active {
+                background: var(--border);
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            position: relative;
+            color: transparent !important;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Character Counter */
+        .char-counter {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Notification - Mobile Friendly */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .notification {
+                top: 80px;
+                right: 16px;
+                left: 16px;
+                text-align: center;
+                justify-content: center;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            /* Prevent text size adjust */
+            html {
+                -webkit-text-size-adjust: 100%;
+                text-size-adjust: 100%;
+            }
+            
+            /* Improve tap targets */
+            button, 
+            .nav-item,
+            .type-card,
+            .tag,
+            .tag-remove {
+                min-height: 44px;
+            }
+            
+            /* Smooth scrolling */
+            .content-area {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Hide scrollbar on mobile */
+            .content-area::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .content-area {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            
+            /* Fix for iOS input zoom */
+            @supports (-webkit-touch-callout: none) {
+                input,
+                textarea,
+                select {
+                    font-size: 16px !important;
+                }
+            }
+            
+            /* Improve touch feedback */
+            button:active,
+            .btn:active,
+            .icon-button:active,
+            .nav-item:active,
+            .type-card:active {
+                opacity: 0.8;
+            }
+            
+            /* Prevent long press menu */
+            a, button {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+            
+            /* Improve form appearance */
+            select {
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 16px;
+                padding-right: 40px;
+            }
+        }
+
+        /* Handle keyboard on mobile */
+        @media (max-width: 768px) {
+            /* Ensure content is visible when keyboard opens */
+            body.keyboard-open .content-area {
+                padding-bottom: 300px;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .content-area {
+                padding: 16px;
+            }
+            
+            .form-card {
+                padding: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 16px;
+            }
+            
+            .form-textarea {
+                min-height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Sidebar - ORIGINAL TUMHARA -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-layer-group"></i>
+                    oneSEt
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <a href="{% url 'create' %}" style="width: auto; padding: 12px 16px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; transition: all 0.3s ease; text-decoration: none;"
+                        onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+                    <i class="fas fa-plus"></i>
+                    Create New
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Menu</div>
+                <nav class="sidebar-nav">
+                    <a href="{% url 'dashboard' %}" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="{% url 'all_items' %}" class="nav-item">
+                        <i class="fas fa-layer-group"></i>
+                        <span>All Items</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Collections</div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item" onclick="filterByCategory('work')">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Work</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="filterByCategory('personal')">
+                        <i class="fas fa-user"></i>
+                        <span>Personal</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Documents</div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item" onclick="filterByType('note')">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>Notes</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="filterByType('task')">
+                        <i class="fas fa-list-check"></i>
+                        <span>Tasks</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="filterByType('link')">
+                        <i class="fas fa-link"></i>
+                        <span>Links</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="filterByType('code')">
+                        <i class="fas fa-code"></i>
+                        <span>Code Snippets</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Account</div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <button class="nav-item" onclick="confirmLogout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content" style="flex: 1; display: flex; flex-direction: column;">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search your content...">
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="icon-button">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="icon-button">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content-area">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h1>Create New Item</h1>
+                        <p>Add notes, tasks, links, code snippets, or documents to your collection</p>
+                    </div>
+
+                    <!-- Form Card -->
+                    <div class="form-card">
+                        <!-- Django Form Start -->
+                        <form method="post" id="createForm" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <!-- Type Selection -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-tag"></i>
+                                    Item Type
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="type-selector">
+                                    <label class="type-card active">
+                                        <input type="radio" name="content_type" value="note" checked>
+                                        <i class="fas fa-sticky-note"></i>
+                                        <span>Note</span>
+                                    </label>
+                                    <label class="type-card">
+                                        <input type="radio" name="content_type" value="task">
+                                        <i class="fas fa-list-check"></i>
+                                        <span>Task</span>
+                                    </label>
+                                    <label class="type-card">
+                                        <input type="radio" name="content_type" value="link">
+                                        <i class="fas fa-link"></i>
+                                        <span>Link</span>
+                                    </label>
+                                    <label class="type-card">
+                                        <input type="radio" name="content_type" value="code">
+                                        <i class="fas fa-code"></i>
+                                        <span>Code</span>
+                                    </label>
+                                    <label class="type-card">
+                                        <input type="radio" name="content_type" value="document">
+                                        <i class="fas fa-file"></i>
+                                        <span>Document</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-heading"></i>
+                                    Title
+                                    <span class="required">*</span>
+                                </label>
+                                <input type="text" name="title" class="form-input" placeholder="What's this about?" required>
+                            </div>
+
+                            <!-- Description/Content -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-align-left"></i>
+                                    Content
+                                    <span class="required">*</span>
+                                </label>
+                                <textarea name="content" class="form-textarea" placeholder="Write your content here..." id="contentTextarea" required></textarea>
+                                <div class="char-counter">
+                                    <span id="charCount">0 characters</span>
+                                    <span>Markdown supported</span>
+                                </div>
+                            </div>
+
+                            <!-- Collection & Priority -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-folder"></i>
+                                        Collection
+                                    </label>
+                                    <select name="category" class="form-select">
+                                        <option value="personal">Personal</option>
+                                        <option value="work">Work</option>
+                                        <option value="study">Study</option>
+                                        <option value="ideas">Ideas</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-flag"></i>
+                                        Priority
+                                    </label>
+                                    <select name="priority" class="form-select">
+                                        <option value="low">Low</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- URL Field (for links) -->
+                            <div class="form-group" id="urlField" style="display: none;">
+                                <label class="form-label">
+                                    <i class="fas fa-link"></i>
+                                    URL
+                                </label>
+                                <input type="url" name="url" class="form-input" placeholder="https://example.com">
+                            </div>
+
+                            <!-- Language Field (for code) -->
+                            <div class="form-group" id="languageField" style="display: none;">
+                                <label class="form-label">
+                                    <i class="fas fa-code"></i>
+                                    Programming Language
+                                </label>
+                                <select name="language" class="form-select">
+                                    <option value="">Select language</option>
+                                    <option value="python">Python</option>
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="java">Java</option>
+                                    <option value="html">HTML</option>
+                                    <option value="css">CSS</option>
+                                    <option value="sql">SQL</option>
+                                </select>
+                            </div>
+
+                            <!-- Due Date (for tasks) -->
+                            <div class="form-group" id="dueDateField" style="display: none;">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Due Date
+                                </label>
+                                <input type="date" name="due_date" class="form-input">
+                            </div>
+
+                            <!-- File Upload (for documents) -->
+                            <div class="form-group" id="documentField" style="display: none;">
+                                <label class="form-label">
+                                    <i class="fas fa-paperclip"></i>
+                                    Upload File
+                                </label>
+                                <div class="file-upload" id="fileUploadZone">
+                                    <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                                    <p style="font-weight: 600; margin-bottom: 8px;">Drag & drop your file here</p>
+                                    <p style="color: var(--text-tertiary); margin-bottom: 16px;">or</p>
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()" style="max-width: 180px; margin: 0 auto;">
+                                        <i class="fas fa-folder-open"></i> Browse Files
+                                    </button>
+                                    <input type="file" id="fileInput" name="file" style="display: none;" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.zip">
+                                    <div id="fileInfo" class="file-info" style="display: none;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-tags"></i>
+                                    Tags
+                                </label>
+                                <div class="tags-container">
+                                    <input type="text" class="tags-input" id="tagsInput" placeholder="Type a tag and press Enter">
+                                    <input type="hidden" name="tags" id="tagsHidden">
+                                </div>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;" id="tagsDisplay"></div>
+                            </div>
+
+                            <!-- Starred -->
+                            <div class="form-group">
+                                <label class="starred-checkbox" id="starredCheckbox">
+                                    <input type="checkbox" name="is_starred" value="true">
+                                    <i class="fas fa-star star-icon"></i>
+                                    <span style="font-weight: 600;">Mark as Starred</span>
+                                </label>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="form-buttons">
+                                <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'dashboard' %}'">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Create Item</span>
+                                </button>
+                            </div>
+                        </form>
+                        <!-- Django Form End -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        let isSidebarOpen = false;
+
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            closeSidebar();
+        });
+
+        function toggleSidebar() {
+            isSidebarOpen = !isSidebarOpen;
+            if (isSidebarOpen) {
+                sidebar.classList.add('active');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                closeSidebar();
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            isSidebarOpen = false;
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (isSidebarOpen && !sidebar.contains(e.target) && e.target !== menuToggle) {
+                closeSidebar();
+            }
+        });
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isSidebarOpen) {
+                closeSidebar();
+            }
+        });
+
+        // Type selector interaction - UPDATED with mobile optimizations
+        document.querySelectorAll('input[name="content_type"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                // Update active class
+                document.querySelectorAll('.type-card').forEach(card => card.classList.remove('active'));
+                e.target.closest('.type-card').classList.add('active');
+                
+                const type = e.target.value;
+                
+                // Show/hide dynamic fields
+                const fields = ['urlField', 'languageField', 'dueDateField', 'documentField'];
+                fields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.style.display = 'none';
+                });
+                
+                // Show relevant field
+                switch(type) {
+                    case 'link':
+                        document.getElementById('urlField').style.display = 'block';
+                        break;
+                    case 'code':
+                        document.getElementById('languageField').style.display = 'block';
+                        break;
+                    case 'task':
+                        document.getElementById('dueDateField').style.display = 'block';
+                        break;
+                    case 'document':
+                        const docField = document.getElementById('documentField');
+                        docField.style.display = 'block';
+                        
+                        // 🚨 IMPORTANT: Make file input required for documents
+                        const fileInput = document.getElementById('fileInput');
+                        if (fileInput) {
+                            fileInput.required = true;
+                        }
+                        break;
+                }
+                
+                // Remove required attribute for other types
+                if (type !== 'document') {
+                    const fileInput = document.getElementById('fileInput');
+                    if (fileInput) {
+                        fileInput.required = false;
+                    }
+                }
+                
+                // Update content placeholder
+                const textarea = document.getElementById('contentTextarea');
+                const placeholders = {
+                    'note': 'Write your notes here...',
+                    'task': 'Describe the task...',
+                    'link': 'Add description about this link...',
+                    'code': 'Paste your code here...',
+                    'document': 'Add notes about this document...'
+                };
+                textarea.placeholder = placeholders[type] || 'Enter your content here...';
+                
+                // On mobile, scroll to show the new field
+                if (window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        const field = document.getElementById(`${type}Field`);
+                        if (field) {
+                            field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                }
+            });
+        });
+
+        // Character Counter
+        const contentTextarea = document.getElementById('contentTextarea');
+        const charCount = document.getElementById('charCount');
+        
+        contentTextarea.addEventListener('input', () => {
+            const count = contentTextarea.value.length;
+            charCount.textContent = `${count} characters`;
+        });
+
+        // Starred Checkbox with mobile touch support
+        const starredCheckbox = document.getElementById('starredCheckbox');
+        const starredInput = starredCheckbox.querySelector('input[type="checkbox"]');
+        
+        starredCheckbox.addEventListener('click', (e) => {
+            e.preventDefault();
+            starredInput.checked = !starredInput.checked;
+            starredCheckbox.classList.toggle('active', starredInput.checked);
+            
+            // Mobile touch feedback
+            if (window.innerWidth <= 768) {
+                starredCheckbox.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    starredCheckbox.style.transform = '';
+                }, 150);
+            }
+        });
+
+        // Tags Management with mobile optimizations
+        const tagsInput = document.getElementById('tagsInput');
+        const tagsHidden = document.getElementById('tagsHidden');
+        const tagsDisplay = document.getElementById('tagsDisplay');
+        let tags = [];
+
+        tagsInput.addEventListener('keydown', (e) => {
+            if ((e.key === 'Enter' || e.key === ',') && tagsInput.value.trim()) {
+                e.preventDefault();
+                addTag(tagsInput.value.trim().replace(/,/g, ''));
+                tagsInput.value = '';
+            }
+        });
+
+        tagsInput.addEventListener('blur', () => {
+            if (tagsInput.value.trim()) {
+                addTag(tagsInput.value.trim());
+                tagsInput.value = '';
+            }
+        });
+
+        // On mobile, add tag on comma or enter
+        if (window.innerWidth <= 768) {
+            tagsInput.addEventListener('input', (e) => {
+                if (e.data === ',') {
+                    const text = tagsInput.value.trim().replace(/,/g, '');
+                    if (text) {
+                        addTag(text);
+                        tagsInput.value = '';
+                    }
+                }
+            });
+        }
+
+        function addTag(tagText) {
+            tagText = tagText.trim();
+            if (!tagText || tags.includes(tagText.toLowerCase())) return;
+            
+            if (tags.length >= 10) {
+                showNotification('Maximum 10 tags allowed', 'error');
+                return;
+            }
+            
+            tags.push(tagText.toLowerCase());
+            updateTagsDisplay();
+            
+            // Mobile visual feedback
+            if (window.innerWidth <= 768) {
+                tagsInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function removeTag(tagText) {
+            tags = tags.filter(t => t !== tagText.toLowerCase());
+            updateTagsDisplay();
+        }
+
+        function updateTagsDisplay() {
+            tagsDisplay.innerHTML = '';
+            tags.forEach(tag => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag';
+                tagElement.innerHTML = `
+                    ${tag}
+                    <span class="tag-remove" onclick="removeTag('${tag}')">&times;</span>
+                `;
+                tagsDisplay.appendChild(tagElement);
+            });
+            
+            tagsHidden.value = tags.join(',');
+        }
+
+        // File Upload with mobile touch support
+        const fileUploadZone = document.getElementById('fileUploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+
+        if (fileUploadZone) {
+            fileUploadZone.addEventListener('click', () => fileInput.click());
+            
+            // Mobile touch feedback
+            if (window.innerWidth <= 768) {
+                fileUploadZone.addEventListener('touchstart', () => {
+                    fileUploadZone.classList.add('dragover');
+                });
+                
+                fileUploadZone.addEventListener('touchend', () => {
+                    setTimeout(() => {
+                        fileUploadZone.classList.remove('dragover');
+                    }, 200);
+                });
+            } else {
+                // Desktop drag & drop
+                fileUploadZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileUploadZone.classList.add('dragover');
+                });
+                
+                fileUploadZone.addEventListener('dragleave', () => {
+                    fileUploadZone.classList.remove('dragover');
+                });
+                
+                fileUploadZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileUploadZone.classList.remove('dragover');
+                    if (e.dataTransfer.files.length > 0) {
+                        fileInput.files = e.dataTransfer.files;
+                        updateFileInfo(e.dataTransfer.files[0]);
+                    }
+                });
+            }
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    updateFileInfo(e.target.files[0]);
+                }
+            });
+        }
+
+        function updateFileInfo(file) {
+            let sizeText;
+            if (file.size < 1024 * 1024) {
+                sizeText = (file.size / 1024).toFixed(0) + ' KB';
+            } else {
+                sizeText = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            }
+            
+            fileInfo.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <strong>${file.name}</strong> (${sizeText})
+                <button onclick="clearFile()" style="margin-left: 12px; background: none; border: none; color: #166534; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            fileInfo.style.display = 'block';
+            
+            // Scroll to show file info on mobile
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    fileInfo.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 300);
+            }
+        }
+
+        function clearFile() {
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+        }
+
+        // Form Submission - Mobile optimized
+        const createForm = document.getElementById('createForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        createForm.addEventListener('submit', function(e) {
+            // Get selected type
+            const selectedType = document.querySelector('input[name="content_type"]:checked').value;
+            const fileInput = document.getElementById('fileInput');
+            
+            // Document type के लिए validation
+            if (selectedType === 'document') {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    e.preventDefault();
+                    showNotification('Please upload a file for document type', 'error');
+                    
+                    // Highlight file upload area
+                    const fileUploadZone = document.getElementById('fileUploadZone');
+                    fileUploadZone.style.borderColor = '#ef4444';
+                    fileUploadZone.style.backgroundColor = '#fee2e2';
+                    
+                    setTimeout(() => {
+                        fileUploadZone.style.borderColor = '';
+                        fileUploadZone.style.backgroundColor = '';
+                    }, 2000);
+                    
+                    // Scroll to file upload on mobile
+                    if (window.innerWidth <= 768) {
+                        fileUploadZone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    
+                    return;
+                }
+            }
+            
+            // Basic title validation
+            const title = document.querySelector('input[name="title"]').value.trim();
+            if (!title) {
+                e.preventDefault();
+                showNotification('Please enter a title', 'error');
+                
+                // Scroll to title input on mobile
+                if (window.innerWidth <= 768) {
+                    document.querySelector('input[name="title"]').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+            
+            // Content validation
+            const content = document.querySelector('textarea[name="content"]').value.trim();
+            if (!content) {
+                e.preventDefault();
+                showNotification('Please enter content', 'error');
+                
+                // Scroll to content input on mobile
+                if (window.innerWidth <= 768) {
+                    document.querySelector('textarea[name="content"]').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span></span>';
+            
+            // Prevent multiple submissions on mobile
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('loading');
+                    submitBtn.innerHTML = '<i class="fas fa-plus"></i><span>Create Item</span>';
+                }, 3000);
+            }
+        });
+
+        function showNotification(message, type = 'error') {
+            // Remove existing notification
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideIn reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Handle keyboard on mobile
+        let isKeyboardOpen = false;
+        
+        // Detect keyboard opening on mobile
+        const originalHeight = window.innerHeight;
+        window.addEventListener('resize', () => {
+            if (window.innerHeight < originalHeight * 0.8) {
+                isKeyboardOpen = true;
+                document.body.classList.add('keyboard-open');
+            } else if (isKeyboardOpen) {
+                isKeyboardOpen = false;
+                document.body.classList.remove('keyboard-open');
+            }
+        });
+
+        // Auto-focus management for mobile
+        if (window.innerWidth <= 768) {
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    setTimeout(() => {
+                        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                });
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Trigger initial type selection
+            const defaultRadio = document.querySelector('input[name="content_type"]:checked');
+            if (defaultRadio) {
+                defaultRadio.dispatchEvent(new Event('change'));
+            }
+            
+            // Set minimum date for due date
+            const dueDateInput = document.querySelector('input[name="due_date"]');
+            if (dueDateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dueDateInput.min = today;
+                
+                // Set default date to tomorrow for better UX
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                dueDateInput.value = tomorrow.toISOString().split('T')[0];
+            }
+            
+            // Auto-focus title input with delay for mobile
+            setTimeout(() => {
+                const titleInput = document.querySelector('input[name="title"]');
+                if (titleInput && window.innerWidth > 768) {
+                    titleInput.focus();
+                }
+            }, 500);
+            
+            // Prevent double-tap zoom on mobile
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Improve mobile touch experience
+            document.querySelectorAll('button, .btn, .type-card, .nav-item').forEach(el => {
+                el.style.cursor = 'pointer';
+                if (window.innerWidth <= 768) {
+                    el.style.webkitTapHighlightColor = 'transparent';
+                }
+            });
+        });
+
+        // Handle back button navigation
+        window.addEventListener('beforeunload', function (e) {
+            const textarea = document.querySelector('textarea');
+            if (textarea && textarea.value.trim()) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        });
+
+        // Helper functions
+        function filterByType(type) {
+            window.location.href = `{% url 'all_items' %}?type=${type}`;
+        }
+
+        function filterByCategory(category) {
+            window.location.href = `{% url 'all_items' %}?category=${category}`;
+        }
+
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '{% url "logout" %}';
+            }
+        }
+    </script>
+</body>
+</html>

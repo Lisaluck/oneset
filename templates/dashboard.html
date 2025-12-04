@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - oneSEt</title>
+    {% load static %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF1B6D;
+            --primary-dark: #E01860;
+            --bg-dark: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --border: #e5e7eb;
+            --radius: 12px;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .sidebar-section {
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            background: none;
+            font-size: 14px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .type-count {
+            margin-left: auto;
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .nav-item.active .type-count {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 12px 10px 36px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-dark);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-tertiary);
+            pointer-events: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .icon-button:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 24px;
+        }
+
+        .welcome-header {
+            margin-bottom: 40px;
+        }
+
+        .welcome-header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .welcome-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .filter-indicator {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .action-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+
+        .action-card i {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .action-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .action-card p {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* Stats Overview */
+        .stats-section {
+            margin-bottom: 40px;
+        }
+
+        .stats-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-tertiary);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(236, 72, 153, 0.1);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-info p {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* Items Section */
+        .items-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .item-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(236, 72, 153, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .item-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .item-desc {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            flex: 1;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .item-meta {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .item-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .item-action-btn:hover {
+            color: var(--primary);
+            background: var(--bg-tertiary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--border);
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .dashboard-wrapper.sidebar-open .sidebar {
+                transform: translateX(0);
+            }
+
+            .content-area {
+                padding: 24px 16px;
+            }
+
+            .welcome-header h1 {
+                font-size: 24px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper" id="dashboardWrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-layer-group"></i>
+                    oneSEt
+                </div>
+            </div>
+
+            <!-- Quick Filters Section -->
+            <div class="sidebar-section">
+                <a href="{% url 'create' %}" style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; transition: all 0.3s ease; text-decoration: none;"
+                        onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
+                    <i class="fas fa-plus"></i>
+                    Create New Item
+                </a>
+                <div class="sidebar-section-title">Quick Filters</div>
+                <nav class="sidebar-nav">
+                    <a href="javascript:void(0)" class="nav-item active" data-filter="all" onclick="filterItems('all')">
+                        <i class="fas fa-home"></i>
+                        <span>All Items</span>
+                        <span class="type-count" id="all-count">{{ total_items }}</span>
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item" data-filter="note" onclick="filterItems('note')">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>Notes</span>
+                        <span class="type-count" id="note-count">{{ note_count }}</span>
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item" data-filter="task" onclick="filterItems('task')">
+                        <i class="fas fa-list-check"></i>
+                        <span>Tasks</span>
+                        <span class="type-count" id="task-count">{{ task_count }}</span>
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item" data-filter="link" onclick="filterItems('link')">
+                        <i class="fas fa-link"></i>
+                        <span>Links</span>
+                        <span class="type-count" id="link-count">{{ link_count }}</span>
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item" data-filter="code" onclick="filterItems('code')">
+                        <i class="fas fa-code"></i>
+                        <span>Code Snippets</span>
+                        <span class="type-count" id="code-count">{{ code_count }}</span>
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item" data-filter="document" onclick="filterItems('document')">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Documents</span>
+                        <span class="type-count" id="document-count">{{ document_count }}</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Collections</div>
+                <nav class="sidebar-nav">
+                    <a href="javascript:void(0)" class="nav-item" onclick="filterByCategory('work')">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Work</span>
+                    </a>
+                    <a href="javascript:void(0)" class="nav-item" onclick="filterByCategory('personal')">
+                        <i class="fas fa-user"></i>
+                        <span>Personal</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Navigation</div>
+                <nav class="sidebar-nav">
+                    <a href="{% url 'dashboard' %}" class="nav-item active">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{% url 'all_items' %}" class="nav-item">
+                        <i class="fas fa-layer-group"></i>
+                        <span>All Items</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Account</div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <button id="logoutBtn" class="nav-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search your content...">
+                        <div class="loading-spinner" id="searchSpinner"></div>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="icon-button">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="icon-button user-menu">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content-area">
+                <!-- Welcome Section -->
+                <div class="welcome-header">
+                    <h1 id="welcomeTitle">
+                        Welcome Back, {{ user.username }}!
+                        <span class="filter-indicator" id="filterIndicator" style="display: none;"></span>
+                    </h1>
+                    <p id="welcomeSubtitle">
+                        Your digital workspace is ready. Let's get organized.
+                    </p>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="{% url 'create' %}" class="action-card">
+                        <i class="fas fa-plus"></i>
+                        <h3>Create New Item</h3>
+                        <p>Add notes, tasks, links, code snippets, or documents</p>
+                    </a>
+                    <a href="{% url 'all_items' %}" class="action-card">
+                        <i class="fas fa-layer-group"></i>
+                        <h3>View All Items</h3>
+                        <p>Browse all your organized content</p>
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-section">
+                    <h2 class="stats-title">Your Stats</h2>
+                    <div class="stats-overview">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-total">{{ total_items }}</h3>
+                                <p>Total Items</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-completed">{{ completed_tasks }}</h3>
+                                <p>Tasks Completed</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-starred">{{ starred_items }}</h3>
+                                <p>Starred Items</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="stat-pending">{{ pending_tasks }}</h3>
+                                <p>Pending Tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items Section -->
+                <div class="items-section">
+                    <div class="section-header">
+                        <h2 class="stats-title" id="itemsTitle">
+                            Recent Items
+                            <span style="font-size: 14px; color: var(--text-tertiary); font-weight: normal; margin-left: 8px;">
+                                (<span id="itemsCount">{{ recent_items|length }}</span> items)
+                            </span>
+                        </h2>
+                        <a href="{% url 'all_items' %}" id="viewAllLink" style="color: var(--primary); text-decoration: none; font-size: 14px;">
+                            View All
+                        </a>
+                    </div>
+                    
+                    <div class="items-grid" id="itemsGrid">
+                        <!-- Items will be dynamically loaded here -->
+                        {% for item in recent_items %}
+                        <div class="item-card" data-id="{{ item.id }}" data-type="{{ item.content_type }}" data-title="{{ item.title|lower }}" data-category="{{ item.category }}" onclick="window.location.href='{% url 'item_detail' item.id %}'">
+                            <div class="item-header">
+                                <div class="item-icon">
+                                    {% if item.content_type == 'note' %}
+                                        <i class="fas fa-sticky-note"></i>
+                                    {% elif item.content_type == 'task' %}
+                                        <i class="fas fa-list-check"></i>
+                                    {% elif item.content_type == 'link' %}
+                                        <i class="fas fa-link"></i>
+                                    {% elif item.content_type == 'code' %}
+                                        <i class="fas fa-code"></i>
+                                    {% elif item.content_type == 'document' %}
+                                        <i class="fas fa-file-pdf"></i>
+                                    {% else %}
+                                        <i class="fas fa-file"></i>
+                                    {% endif %}
+                                </div>
+                                <span class="item-badge">{{ item.content_type|title }}</span>
+                            </div>
+                            <div class="item-title">{{ item.title }}</div>
+                            <div class="item-desc">
+                                {% if item.content_type == 'document' and item.file %}
+                                    File: {{ item.get_file_name }} ({{ item.get_file_size }})
+                                {% elif item.content_type == 'link' and item.url %}
+                                    {{ item.url|truncatewords:10 }}
+                                {% elif item.content %}
+                                    {{ item.content|truncatewords:20 }}
+                                {% else %}
+                                    No content
+                                {% endif %}
+                            </div>
+                            <div class="item-meta">
+                                <span>{{ item.created_at|date:"M d, Y" }}</span>
+                                <div class="item-actions">
+                                    {% if item.is_starred %}
+                                        <button class="item-action-btn" title="Starred" onclick="event.stopPropagation(); toggleStar('{{ item.id }}', this)">
+                                            <i class="fas fa-star" style="color: #f59e0b;"></i>
+                                        </button>
+                                    {% else %}
+                                        <button class="item-action-btn" title="Star" onclick="event.stopPropagation(); toggleStar('{{ item.id }}', this)">
+                                            <i class="far fa-star"></i>
+                                        </button>
+                                    {% endif %}
+                                    {% if item.content_type == 'task' %}
+                                        {% if item.is_completed %}
+                                            <button class="item-action-btn" title="Completed" onclick="event.stopPropagation(); toggleTaskStatus('{{ item.id }}', this)">
+                                                <i class="fas fa-check" style="color: #10b981;"></i>
+                                            </button>
+                                        {% else %}
+                                            <button class="item-action-btn" title="Mark Complete" onclick="event.stopPropagation(); toggleTaskStatus('{{ item.id }}', this)">
+                                                <i class="far fa-square"></i>
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="empty-state" id="emptyState" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <h3 id="emptyStateTitle">No items found</h3>
+                        <p id="emptyStateMessage">
+                            Create your first item to get started
+                        </p>
+                        <a href="{% url 'create' %}" style="display: inline-block; padding: 12px 24px; background: var(--primary); color: white; text-decoration: none; border-radius: var(--radius); font-weight: 600; margin-top: 16px;">
+                            Create Your First Item
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - In real app, this would come from Django context or API
+        const allItems = [
+            {% for item in recent_items %}
+            {
+                id: "{{ item.id }}",
+                title: "{{ item.title|escapejs }}",
+                content_type: "{{ item.content_type }}",
+                content: "{{ item.content|escapejs|truncatewords:20 }}",
+                url: "{{ item.url|default:'' }}",
+                is_starred: {{ item.is_starred|yesno:"true,false" }},
+                is_completed: {{ item.is_completed|yesno:"true,false" }},
+                created_at: "{{ item.created_at|date:'M d, Y' }}",
+                category: "{{ item.category|default:'personal' }}",
+                file_name: "{{ item.get_file_name|default:'' }}",
+                file_size: "{{ item.get_file_size|default:'' }}"
+            },
+            {% endfor %}
+        ];
+
+        // Current filters
+        let currentFilter = 'all';
+        let currentCategory = '';
+        let currentSearch = '';
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const dashboardWrapper = document.getElementById('dashboardWrapper');
+
+        menuToggle.addEventListener('click', function() {
+            dashboardWrapper.classList.toggle('sidebar-open');
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking nav items on mobile
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    dashboardWrapper.classList.remove('sidebar-open');
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '{% url "logout" %}';
+            }
+        });
+
+        // Search functionality - FIXED: Title-wise search only
+        const searchInput = document.getElementById('searchInput');
+        const searchSpinner = document.getElementById('searchSpinner');
+
+        let searchTimeout;
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchSpinner.style.display = 'inline-block';
+            
+            searchTimeout = setTimeout(() => {
+                currentSearch = e.target.value.toLowerCase();
+                performSearch(currentSearch);
+                searchSpinner.style.display = 'none';
+            }, 300);
+        });
+
+        function performSearch(query) {
+            // Filter items based on title only
+            const filtered = allItems.filter(item => {
+                // Only search in title, not in content or URL
+                return item.title.toLowerCase().includes(query);
+            });
+            
+            updateDisplayedItems(filtered);
+            updateItemsCount(filtered.length);
+            
+            // Update UI based on search
+            if (query) {
+                document.getElementById('welcomeTitle').innerHTML = `Search Results for "${query}"`;
+                document.getElementById('welcomeSubtitle').textContent = `Found ${filtered.length} items`;
+                document.getElementById('filterIndicator').style.display = 'none';
+                document.getElementById('itemsTitle').innerHTML = `Search Results <span style="font-size: 14px; color: var(--text-tertiary); font-weight: normal; margin-left: 8px;">(${filtered.length} items)</span>`;
+            } else {
+                resetToCurrentFilter();
+            }
+        }
+
+        // Filter items by type
+        function filterItems(type) {
+            currentFilter = type;
+            currentSearch = '';
+            searchInput.value = '';
+            
+            // Update active nav item
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.filter === type) {
+                    item.classList.add('active');
+                }
+            });
+            
+            let filteredItems;
+            if (type === 'all') {
+                filteredItems = allItems;
+            } else {
+                filteredItems = allItems.filter(item => item.content_type === type);
+            }
+            
+            // Apply category filter if active
+            if (currentCategory) {
+                filteredItems = filteredItems.filter(item => item.category === currentCategory);
+            }
+            
+            updateDisplayedItems(filteredItems);
+            updateUIForFilter(type, filteredItems.length);
+        }
+
+        // Filter by category
+        function filterByCategory(category) {
+            currentCategory = currentCategory === category ? '' : category;
+            
+            let filteredItems = allItems;
+            
+            // Apply type filter
+            if (currentFilter !== 'all') {
+                filteredItems = filteredItems.filter(item => item.content_type === currentFilter);
+            }
+            
+            // Apply category filter
+            if (currentCategory) {
+                filteredItems = filteredItems.filter(item => item.category === currentCategory);
+            }
+            
+            updateDisplayedItems(filteredItems);
+            updateUIForCategory(category, filteredItems.length);
+        }
+
+        // Update displayed items in grid
+        function updateDisplayedItems(items) {
+            const itemsGrid = document.getElementById('itemsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (items.length === 0) {
+                itemsGrid.innerHTML = '';
+                emptyState.style.display = 'block';
+                
+                // Update empty state message based on current filter
+                let message = 'No items found';
+                if (currentSearch) {
+                    message = `No items found for "${currentSearch}"`;
+                } else if (currentFilter !== 'all') {
+                    message = `No ${currentFilter} items found`;
+                } else if (currentCategory) {
+                    message = `No items in ${currentCategory} category`;
+                }
+                
+                document.getElementById('emptyStateTitle').textContent = message;
+                document.getElementById('emptyStateMessage').textContent = currentSearch 
+                    ? 'Try a different search term' 
+                    : 'Create your first item to get started';
+            } else {
+                emptyState.style.display = 'none';
+                
+                let itemsHTML = '';
+                items.forEach(item => {
+                    itemsHTML += `
+                        <div class="item-card" data-id="${item.id}" data-type="${item.content_type}" data-title="${item.title.toLowerCase()}" data-category="${item.category}" onclick="window.location.href='{% url 'item_detail' 0 %}'.replace('0', '${item.id}')">
+                            <div class="item-header">
+                                <div class="item-icon">
+                                    ${getIconForType(item.content_type)}
+                                </div>
+                                <span class="item-badge">${item.content_type.charAt(0).toUpperCase() + item.content_type.slice(1)}</span>
+                            </div>
+                            <div class="item-title">${escapeHtml(item.title)}</div>
+                            <div class="item-desc">
+                                ${getDescriptionForItem(item)}
+                            </div>
+                            <div class="item-meta">
+                                <span>${item.created_at}</span>
+                                <div class="item-actions">
+                                    <button class="item-action-btn" title="${item.is_starred ? 'Starred' : 'Star'}" onclick="event.stopPropagation(); toggleStar('${item.id}', this)">
+                                        <i class="${item.is_starred ? 'fas' : 'far'} fa-star" style="${item.is_starred ? 'color: #f59e0b;' : ''}"></i>
+                                    </button>
+                                    ${item.content_type === 'task' ? `
+                                        <button class="item-action-btn" title="${item.is_completed ? 'Completed' : 'Mark Complete'}" onclick="event.stopPropagation(); toggleTaskStatus('${item.id}', this)">
+                                            <i class="${item.is_completed ? 'fas' : 'far'} ${item.is_completed ? 'fa-check' : 'fa-square'}" style="${item.is_completed ? 'color: #10b981;' : ''}"></i>
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                itemsGrid.innerHTML = itemsHTML;
+            }
+            
+            // Update stats counters dynamically
+            updateStatsCounters();
+        }
+
+        // Get icon for item type
+        function getIconForType(type) {
+            const icons = {
+                'note': '<i class="fas fa-sticky-note"></i>',
+                'task': '<i class="fas fa-list-check"></i>',
+                'link': '<i class="fas fa-link"></i>',
+                'code': '<i class="fas fa-code"></i>',
+                'document': '<i class="fas fa-file-pdf"></i>'
+            };
+            return icons[type] || '<i class="fas fa-file"></i>';
+        }
+
+        // Get description for item
+        function getDescriptionForItem(item) {
+            if (item.content_type === 'document' && item.file_name) {
+                return `File: ${item.file_name} (${item.file_size})`;
+            } else if (item.content_type === 'link' && item.url) {
+                return truncateText(item.url, 10);
+            } else if (item.content) {
+                return truncateText(item.content, 20);
+            }
+            return 'No content';
+        }
+
+        // Update UI for filter
+        function updateUIForFilter(type, count) {
+            const filterIndicator = document.getElementById('filterIndicator');
+            const welcomeTitle = document.getElementById('welcomeTitle');
+            const welcomeSubtitle = document.getElementById('welcomeSubtitle');
+            const itemsTitle = document.getElementById('itemsTitle');
+            const viewAllLink = document.getElementById('viewAllLink');
+            
+            if (type === 'all') {
+                filterIndicator.style.display = 'none';
+                welcomeTitle.innerHTML = `Welcome Back, {{ user.username }}!`;
+                welcomeSubtitle.textContent = 'Your digital workspace is ready. Let\'s get organized.';
+                itemsTitle.innerHTML = `Recent Items <span style="font-size: 14px; color: var(--text-tertiary); font-weight: normal; margin-left: 8px;">(${count} items)</span>`;
+                viewAllLink.href = "{% url 'all_items' %}";
+            } else {
+                const typeNames = {
+                    'note': 'Notes',
+                    'task': 'Tasks',
+                    'link': 'Links',
+                    'code': 'Code Snippets',
+                    'document': 'Documents'
+                };
+                
+                filterIndicator.textContent = typeNames[type];
+                filterIndicator.style.display = 'inline-block';
+                welcomeTitle.innerHTML = `Welcome Back, {{ user.username }}!`;
+                welcomeSubtitle.textContent = `Showing all ${type} items`;
+                itemsTitle.innerHTML = `All ${typeNames[type]} <span style="font-size: 14px; color: var(--text-tertiary); font-weight: normal; margin-left: 8px;">(${count} items)</span>`;
+                viewAllLink.href = `{% url 'all_items' %}?type=${type}`;
+            }
+            
+            updateItemsCount(count);
+        }
+
+        // Update UI for category
+        function updateUIForCategory(category, count) {
+            if (category) {
+                document.getElementById('welcomeSubtitle').textContent = `Showing ${category} items`;
+            } else {
+                resetToCurrentFilter();
+            }
+        }
+
+        // Reset to current filter
+        function resetToCurrentFilter() {
+            filterItems(currentFilter);
+        }
+
+        // Update items count
+        function updateItemsCount(count) {
+            document.getElementById('itemsCount').textContent = count;
+        }
+
+        // Update stats counters dynamically
+        function updateStatsCounters() {
+            // Calculate stats from allItems (not filtered items)
+            const totalItems = allItems.length;
+            const completedTasks = allItems.filter(item => item.content_type === 'task' && item.is_completed).length;
+            const starredItems = allItems.filter(item => item.is_starred).length;
+            const pendingTasks = allItems.filter(item => item.content_type === 'task' && !item.is_completed).length;
+            
+            // Update DOM
+            document.getElementById('stat-total').textContent = totalItems;
+            document.getElementById('stat-completed').textContent = completedTasks;
+            document.getElementById('stat-starred').textContent = starredItems;
+            document.getElementById('stat-pending').textContent = pendingTasks;
+            
+            // Update sidebar counts
+            document.getElementById('all-count').textContent = totalItems;
+            document.getElementById('note-count').textContent = allItems.filter(item => item.content_type === 'note').length;
+            document.getElementById('task-count').textContent = allItems.filter(item => item.content_type === 'task').length;
+            document.getElementById('link-count').textContent = allItems.filter(item => item.content_type === 'link').length;
+            document.getElementById('code-count').textContent = allItems.filter(item => item.content_type === 'code').length;
+            document.getElementById('document-count').textContent = allItems.filter(item => item.content_type === 'document').length;
+        }
+
+        // Toggle star status
+        function toggleStar(itemId, button) {
+            const item = allItems.find(item => item.id === itemId);
+            if (item) {
+                item.is_starred = !item.is_starred;
+                const icon = button.querySelector('i');
+                if (item.is_starred) {
+                    icon.className = 'fas fa-star';
+                    icon.style.color = '#f59e0b';
+                    button.title = 'Starred';
+                } else {
+                    icon.className = 'far fa-star';
+                    icon.style.color = '';
+                    button.title = 'Star';
+                }
+                
+                // Update stats
+                updateStatsCounters();
+                
+                // Send AJAX request to update in backend
+                updateItemInBackend(itemId, { is_starred: item.is_starred });
+            }
+        }
+
+        // Toggle task status
+        function toggleTaskStatus(itemId, button) {
+            const item = allItems.find(item => item.id === itemId);
+            if (item && item.content_type === 'task') {
+                item.is_completed = !item.is_completed;
+                const icon = button.querySelector('i');
+                if (item.is_completed) {
+                    icon.className = 'fas fa-check';
+                    icon.style.color = '#10b981';
+                    button.title = 'Completed';
+                } else {
+                    icon.className = 'far fa-square';
+                    icon.style.color = '';
+                    button.title = 'Mark Complete';
+                }
+                
+                // Update stats
+                updateStatsCounters();
+                
+                // Send AJAX request to update in backend
+                updateItemInBackend(itemId, { is_completed: item.is_completed });
+            }
+        }
+
+        // Update item in backend (simulated)
+        function updateItemInBackend(itemId, data) {
+            // In real app, use fetch API to update in backend
+            console.log('Updating item', itemId, data);
+            
+            // Simulate API call
+            fetch(`/api/items/${itemId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Item updated:', data);
+            })
+            .catch(error => {
+                console.error('Error updating item:', error);
+            });
+        }
+
+        // Utility functions
+        function truncateText(text, maxWords) {
+            const words = text.split(' ');
+            if (words.length > maxWords) {
+                return words.slice(0, maxWords).join(' ') + '...';
+            }
+            return text;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatsCounters();
+        });
+    </script>
+</body>
+</html
