@@ -63,20 +63,27 @@ TEMPLATES = [
     },
 ]
 
-# Database - PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'oneset',
-        'USER': 'postgres',
-        'PASSWORD': 'Leelima@123',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-        },
+if 'RENDER' in os.environ:
+    # Render PostgreSQL
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600
+        )
     }
-}
+else:
+    # Local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'oneset',
+            'USER': 'postgres',
+            'PASSWORD': 'Leelima@123',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # REST Framework Configuration
 REST_FRAMEWORK = {
