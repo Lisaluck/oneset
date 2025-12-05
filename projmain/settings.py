@@ -63,7 +63,7 @@ TEMPLATES = [
     },
 ]
 
- DATABASES = {
+DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'oneset',
@@ -72,7 +72,7 @@ TEMPLATES = [
             'HOST': 'localhost',
             'PORT': '5432',
         }
-    }
+}
 
 # REST Framework Configuration
 REST_FRAMEWORK = {
