@@ -63,18 +63,7 @@ TEMPLATES = [
     },
 ]
 
-if 'RENDER' in os.environ:
-    # Render PostgreSQL
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600
-        )
-    }
-else:
-    # Local development
-    DATABASES = {
+ DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'oneset',
