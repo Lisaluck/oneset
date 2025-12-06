@@ -10,7 +10,10 @@ router.register(r'profile', views.UserProfileViewSet, basename='profile')
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/', include('rest_framework.urls')),
+    path('api/', projmain_views.api_root, name='api-root'),
     
+    # API endpoints
+    path('api/', include(router.urls)),
     # Template URLs
     path('home/', views.home_view, name='home'),
     path('login/', views.login_view, name='login'),
