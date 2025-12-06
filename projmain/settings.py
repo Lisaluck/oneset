@@ -88,12 +88,17 @@ DATABASES = {
 DATABASES['default'] = dj_database_url.parse("postgresql://oneset_user:xJKLBZPlzmUl753KCiVH7H0Fwyfxsv2m@dpg-d4q2igchg0os73818k90-a/oneset")
 #postgresql://oneset_user:xJKLBZPlzmUl753KCiVH7H0Fwyfxsv2m@dpg-d4q2igchg0os73818k90-a/oneset
 # REST Framework Configuration
+# REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        # Change this to allow read-only access to unauthenticated users
+        'rest_framework.permissions.AllowAny',
+        # OR use this for more control:
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
