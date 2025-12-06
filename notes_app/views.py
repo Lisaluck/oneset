@@ -15,7 +15,7 @@ from .forms import CustomUserCreationForm, CustomAuthenticationForm, ContentItem
 from django.http import FileResponse, HttpResponse, JsonResponse
 import os
 from django.conf import settings
-
+from . import views
 # Template-based views
 def home_view(request):
     return render(request, 'index.html')
