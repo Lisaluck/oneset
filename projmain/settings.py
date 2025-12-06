@@ -1,6 +1,7 @@
 """
 Django settings for projmain project.
 """
+import dj_database_url
 import os 
 from pathlib import Path
 
@@ -12,7 +13,7 @@ SECRET_KEY = 'django-insecure-ixux^7a_wc#@q)esmk_4@_ausw#e=g@kzqagl74oww0(n3h3*z
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = [*]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -74,11 +75,8 @@ DATABASES = {
     }
 }
 
-# OR using DATABASE_URL (better)
-if 'DATABASE_URL' in os.environ:
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.config(default=os.environ.get('DATABASE_URL'))
-
+DATABASES['default'] = dj_database_url.parse("postgresql://oneset_user:xJKLBZPlzmUl753KCiVH7H0Fwyfxsv2m@dpg-d4q2igchg0os73818k90-a/oneset")
+#postgresql://oneset_user:xJKLBZPlzmUl753KCiVH7H0Fwyfxsv2m@dpg-d4q2igchg0os73818k90-a/oneset
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
