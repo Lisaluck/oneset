@@ -44,6 +44,16 @@ def register_view(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'auth/register.html', {'form': form})
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'notes': reverse('contentitem-list', request=request, format=format),
+        'profile': reverse('userprofile-list', request=request, format=format),
+        'login': reverse('rest_framework:login', request=request, format=format),
+        'logout': reverse('rest_framework:logout', request=request, format=format),
+    })
 
 @login_required
 def dashboard_view(request):
