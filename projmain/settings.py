@@ -13,10 +13,18 @@ SECRET_KEY = 'django-insecure-ixux^7a_wc#@q)esmk_4@_ausw#e=g@kzqagl74oww0(n3h3*z
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+# Get ALLOWED_HOSTS from environment variable
+allowed_hosts_str = os.environ.get("ALLOWED_HOSTS", "")
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(" ") if host.strip()]
+
+# Add RENDER_EXTERNAL_HOSTNAME if available
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# If still empty and in production, add a default
+if not DEBUG and not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
